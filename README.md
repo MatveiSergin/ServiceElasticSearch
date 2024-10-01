@@ -137,8 +137,9 @@
 1. **Клонируйте репозиторий**:
    
    ```bash
-   git clone https://github.com/yourusername/your-repo.git
-   cd your-repo
+   git clone https://github.com/MatveiSergin/ServiceElasticSearch
+   cd ServiceElasticSearch
+   
 2. **Наличие Docker**:
    Необходим Docker и Docker Compose для запуска сервисов.
 3. **Переменные окружения**:
