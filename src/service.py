@@ -1,6 +1,4 @@
-import time
 import uuid
-
 from repository import IRepository, OfferRepository
 
 
@@ -21,5 +19,5 @@ class OfferService:
         async for uuids in self.repository.read_uuids(chunk_size):
             yield uuids
 
-    async def update_similar_sku_offer(self, values: list[str, list[uuid.UUID]]) -> None:
+    async def update_similar_sku_offer(self, values: list[tuple[str, list[uuid.UUID]]]) -> None:
         await self.repository.update_similar_sku_offer(values)

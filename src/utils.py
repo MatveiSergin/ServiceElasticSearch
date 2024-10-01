@@ -1,5 +1,4 @@
 def get_category_lvls(categories: dict, cat_id: int) -> tuple[str, str, str, str]:
-    lvl_1 = lvl_2 = lvl_3 = None
     category = categories.get(cat_id)
     cat_lvls = []
     while category is not None:

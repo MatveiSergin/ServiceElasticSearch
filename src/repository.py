@@ -1,9 +1,6 @@
 import asyncio
 import uuid
 from abc import ABC, abstractmethod
-
-import asyncpg
-
 from database import AbstractDatabase, AsyncDatabase
 from settings import settings
 from sql_query import INSERT_OFFER, OFFER_UPDATE, GET_COUNT_OFFERS, SELECT_UUID_FROM_OFFERS
@@ -42,45 +39,51 @@ class OfferRepository(IRepository):
         pool = await self.inst_db.get_pool()
         async with pool.acquire() as conn:
             await conn.execute(INSERT_OFFER,
-                                 offer['uuid'],
-                                 offer['marketplace_id'],
-                                 offer['product_id'],
-                                 offer['title'],
-                                 offer['description'],
-                                 offer['brand'],
-                                 offer['seller_id'],
-                                 offer['seller_name'],
-                                 offer['first_image_url'],
-                                 offer['category_id'],
-                                 offer['category_lvl_1'],
-                                 offer['category_lvl_2'],
-                                 offer['category_lvl_3'],
-                                 offer['category_remaining'],
-                                 offer['features'],
-                                 offer['rating_count'],
-                                 offer['rating_value'],
-                                 offer['price_before_discounts'],
-                                 offer['discount'],
-                                 offer['price_after_discounts'],
-                                 offer['bonuses'],
-                                 offer['sales'],
-                                 offer['inserted_at'],
-                                 offer['updated_at'],
-                                 offer['currency'],
-                                 offer['barcode'],
-                                 )
+                               offer['uuid'],
+                               offer['marketplace_id'],
+                               offer['product_id'],
+                               offer['title'],
+                               offer['description'],
+                               offer['brand'],
+                               offer['seller_id'],
+                               offer['seller_name'],
+                               offer['first_image_url'],
+                               offer['category_id'],
+                               offer['category_lvl_1'],
+                               offer['category_lvl_2'],
+                               offer['category_lvl_3'],
+                               offer['category_remaining'],
+                               offer['features'],
+                               offer['rating_count'],
+                               offer['rating_value'],
+                               offer['price_before_discounts'],
+                               offer['discount'],
+                               offer['price_after_discounts'],
+                               offer['bonuses'],
+                               offer['sales'],
+                               offer['inserted_at'],
+                               offer['updated_at'],
+                               offer['currency'],
+                               offer['barcode'],
+                               )
 
     async def read(self, offer_id: str) -> dict:
         pass
 
-    async def update_similar_sku_offer(self, values: list[str, list[uuid.UUID]]) -> None:
+    async def update_similar_sku_offer(self, values: list[tuple[str, list[uuid.UUID]]]) -> None:
         pool = await self.inst_db.get_pool()
-        async with pool.acquire() as conn:
-            tasks = []
-            for value, offer_id in values:
-                tasks.append(conn.execute(OFFER_UPDATE, value, offer_id))
+        tasks = []
 
-            await asyncio.gather(*tasks)
+        for offer_id, value in values:
+            async def execute_update(offers_id, array):
+                async with pool.acquire() as conn:
+                    return await conn.execute(OFFER_UPDATE, [str(v) for v in array], str(offers_id))
+
+            tasks.append(execute_update(offer_id, value))
+
+        results = await asyncio.gather(*tasks)
+
+        print(results)
 
     async def read_uuids(self, limit: int) -> list[str]:
         pool = await self.inst_db.get_pool()

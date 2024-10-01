@@ -1,7 +1,6 @@
-from parser import XmlParser
 import asyncio
 import time
-from managers import XmlManager, ElasticSearchManager, ServiceManager
+from managers import ServiceManager
 
 
 async def main():
@@ -12,6 +11,8 @@ async def main():
     start = end
     await ServiceManager().update_similar_sku_for_offers()
     end = time.time()
-    print("time updating process", end-start)
+    print("time updating process", end - start)
+
+
 if __name__ == "__main__":
     asyncio.run(main())

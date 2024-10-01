@@ -10,6 +10,7 @@ class SettingsFactory:
         else:
             return LinuxSettings()
 
+
 class Settings(BaseSettings):
     DB_USER: str
     DB_PASSWORD: str
@@ -18,10 +19,13 @@ class Settings(BaseSettings):
     ELASTICSEARCH_URL: str
     XML_FILE_PATH: str
 
+
 class WindowsSettings(Settings):
     model_config = SettingsConfigDict(env_file='.env')
 
+
 class LinuxSettings(Settings):
     model_config = SettingsConfigDict(env_file='src/.env')
+
 
 settings = SettingsFactory.get_settings()

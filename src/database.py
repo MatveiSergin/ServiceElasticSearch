@@ -1,5 +1,3 @@
-import abc
-
 import asyncpg
 import multiprocessing
 import abc
@@ -70,7 +68,6 @@ class AsyncDatabase(AbstractDatabase):
             self._conn = await self._create_connection()
         return self._conn
 
-
     async def _create_connection(self):
         self.conn = await asyncpg.connect(user=self._user,
                                           password=self._password,
@@ -78,8 +75,3 @@ class AsyncDatabase(AbstractDatabase):
                                           host=self._host,
                                           )
         return self.conn
-
-
-
-
-

@@ -1,6 +1,5 @@
 import asyncio
 from datetime import datetime
-
 from elasticsearch.helpers import async_bulk
 import time as tmm
 from parser import XmlParserProtocol, XmlParser
@@ -173,7 +172,7 @@ class ServiceManager:
             tasks = [self._xml_manager.inst_offer_service.create_offer(offer) for offer in offers]
             await asyncio.gather(*tasks)
         if len(offers_for_es) > 0:
-            await self._xml_manager.inst_es.insert_offers(offers_for_es)
+            await self._elastic_search_manager.insert_offers(offers_for_es)
 
         await self._elastic_search_manager.close_conn()
 
@@ -181,22 +180,12 @@ class ServiceManager:
         tasks = []
         values = []
         async for uuids in self.ints_offer_service.fetch_uuids():
-            for uuid in uuids:
-                t = tmm.time()
-                tasks += [self._elastic_search_manager.find_similar_sku(uuid)]
-                if len(tasks) > 500:
-                    res = await asyncio.gather(*tasks)
-                    tasks = []
-                    print("res", res)
-                    print(tmm.time() - t)
-                    t = tmm.time()
-                #values += [similar_sku, uuid]
-
-        task = await self.ints_offer_service.update_similar_sku_offer(values)
-
-        #tasks.append(task)
-
-        #        if len(tasks) > multiprocessing.cpu_count():
-                    #await asyncio.gather(*tasks)
-        #            tasks = []
-
+            t = tmm.time()
+            for offer_id in uuids:
+                tasks += [self._elastic_search_manager.find_similar_sku(offer_id)]
+            res = await asyncio.gather(*tasks)
+            tasks = []
+            values += [value for value in zip(uuids, res)]
+            print(tmm.time() - t, len(uuids))
+            await self.ints_offer_service.update_similar_sku_offer(values)
+            print(tmm.time() - t, len(uuids))
