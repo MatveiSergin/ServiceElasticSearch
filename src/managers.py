@@ -1,7 +1,6 @@
 import asyncio
 from datetime import datetime
 from elasticsearch.helpers import async_bulk
-import time as tmm
 from parser import XmlParserProtocol, XmlParser
 from service import OfferService
 from utils import get_category_lvls, calculate_discount, conversion_from_str_to_int_or_none
@@ -34,7 +33,6 @@ class XmlManager:
 
     async def get_offers(self) -> dict:
         categories = self.get_categories()
-        print("start")
         offers_generator = self.inst_xml_parser.parse_xml(tag="offer")
         for offer in offers_generator:
             cat_id = offer.get("categoryId", None)
@@ -145,22 +143,17 @@ class ServiceManager:
         self.ints_offer_service = offer_service()
 
     async def process_offers(self) -> None:
-        c = 0  # remove
-        t = tmm.time()
         offers = []
         offers_for_es = []
 
         async for offer in self._xml_manager.get_offers():
 
             offers.append(offer)
-            c += 1
+
             if len(offers) > multiprocessing.cpu_count():
                 tasks = [self._xml_manager.inst_offer_service.create_offer(offer) for offer in offers]
                 offers_for_es.extend(offers)
 
-                if c % 1000 == 0:
-                    print(tmm.time() - t)
-                    t = tmm.time()
                 if len(offers_for_es) > multiprocessing.cpu_count() * 100:
                     await asyncio.gather(*tasks, self._elastic_search_manager.insert_offers(offers_for_es))
                     offers_for_es = []
@@ -180,12 +173,9 @@ class ServiceManager:
         tasks = []
         values = []
         async for uuids in self.ints_offer_service.fetch_uuids():
-            t = tmm.time()
             for offer_id in uuids:
                 tasks += [self._elastic_search_manager.find_similar_sku(offer_id)]
             res = await asyncio.gather(*tasks)
             tasks = []
             values += [value for value in zip(uuids, res)]
-            print(tmm.time() - t, len(uuids))
             await self.ints_offer_service.update_similar_sku_offer(values)
-            print(tmm.time() - t, len(uuids))
