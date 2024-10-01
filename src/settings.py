@@ -8,6 +8,6 @@ class Settings(BaseSettings):
     DB_NAME: str
     ELASTICSEARCH_URL: str
     XML_FILE_PATH: str
-    model_config = SettingsConfigDict(env_file='.env')
+    model_config = SettingsConfigDict(env_file='src/.env')
 
 settings = Settings()
