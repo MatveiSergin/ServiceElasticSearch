@@ -151,7 +151,7 @@ class ServiceManager:
         offers = []
         offers_for_es = []
 
-        for offer in self._xml_manager.get_offers():
+        async for offer in self._xml_manager.get_offers():
 
             offers.append(offer)
             c += 1
@@ -162,7 +162,7 @@ class ServiceManager:
                 if c % 1000 == 0:
                     print(tmm.time() - t)
                     t = tmm.time()
-                if len(offers_for_es) > 1300:
+                if len(offers_for_es) > multiprocessing.cpu_count() * 100:
                     await asyncio.gather(*tasks, self._xml_manager.inst_es.insert_offers(offers_for_es))
                     offers_for_es = []
                 else:

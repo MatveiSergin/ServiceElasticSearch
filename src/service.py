@@ -22,7 +22,4 @@ class OfferService:
             yield uuids
 
     async def update_similar_sku_offer(self, values: list[str, list[uuid.UUID]]) -> None:
-        s = time.time()
-        print(2)
         await self.repository.update_similar_sku_offer(values)
-        print(2, time.time() - s)

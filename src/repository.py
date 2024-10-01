@@ -75,7 +75,6 @@ class OfferRepository(IRepository):
 
     async def update_similar_sku_offer(self, values: list[str, list[uuid.UUID]]) -> None:
         pool = await self.inst_db.get_pool()
-        print(3)
         async with pool.acquire() as conn:
             tasks = []
             for value, offer_id in values:
