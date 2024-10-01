@@ -153,7 +153,7 @@
 4. **Запуск приложения**:
    Запустите приложение: Используйте Docker Compose для запуска контейнеров PostgreSQL, Elasticsearch и приложения:
    ```bash
-   docker-compose up --build```
+   docker-compose up --build
 
 ## Запуск сервиса
    Основная точка входа - файл src/main.py. Она включает два основных шага:
