@@ -163,7 +163,7 @@ class ServiceManager:
                     print(tmm.time() - t)
                     t = tmm.time()
                 if len(offers_for_es) > multiprocessing.cpu_count() * 100:
-                    await asyncio.gather(*tasks, self._xml_manager.inst_es.insert_offers(offers_for_es))
+                    await asyncio.gather(*tasks, self._elastic_search_manager.insert_offers(offers_for_es))
                     offers_for_es = []
                 else:
                     await asyncio.gather(*tasks)
